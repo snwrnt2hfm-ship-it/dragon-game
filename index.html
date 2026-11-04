@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ドラゴン育成島</title>
+<style>
+:root{--ink:#243047;--muted:#66738a;--panel:#fff;--bg:#eef5f3;--green:#3c9877;--gold:#d89a2b;--line:#dce7e3}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#e5f3ef,#f8f1df);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:var(--ink)}
+main{max-width:980px;margin:auto;padding:22px 16px 48px}.hero{background:linear-gradient(120deg,#255f57,#4c9b7a);color:white;border-radius:22px;padding:22px 24px;box-shadow:0 12px 30px #244b3b22}
+h1{margin:0 0 6px;font-size:clamp(25px,5vw,36px)}.hero p{margin:0;color:#e4f5eb}.statsbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pill{background:#ffffff20;border:1px solid #ffffff40;border-radius:999px;padding:7px 13px;font-weight:700}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tabs button,.action{border:0;border-radius:12px;padding:11px 16px;background:#fff;color:var(--ink);font-weight:750;cursor:pointer;box-shadow:0 3px 10px #233b3010}.tabs button.active,.action.primary{background:var(--green);color:#fff}.tabs button:focus-visible,.action:focus-visible{outline:3px solid #e6ae44;outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 7px 20px #203c3010}.card h2,.card h3{margin:0 0 12px}.dragon{display:flex;align-items:center;gap:16px}.sprite{font-size:76px;line-height:1.1;background:#eaf5ef;border-radius:18px;padding:12px}.muted{color:var(--muted);font-size:14px}.meter{height:10px;background:#e9efed;border-radius:99px;overflow:hidden;margin:6px 0 12px}.meter span{display:block;height:100%;background:linear-gradient(90deg,#53ae87,#9acb74);border-radius:99px}.statline{display:flex;justify-content:space-between;gap:10px;font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.action{background:#edf4f1;box-shadow:none}.action:disabled{opacity:.45;cursor:not-allowed}.log{background:#f5f8f7;border-radius:12px;padding:12px;min-height:76px;white-space:pre-line;font-size:14px}.egg{font-size:76px;text-align:center;padding:10px}.shopitem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.shopitem:last-child{border:0}.notice{background:#fff5dc;border:1px solid #f0dda8;padding:12px;border-radius:12px;font-size:14px}.rare{color:#9a59bd;font-weight:800}.small{font-size:12px;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+@media(max-width:520px){main{padding:14px 11px 30px}.hero{padding:18px}.sprite{font-size:58px}.card{padding:15px}}
+</style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#f5f7fb">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
+}
+</script>
+
+</head>
+<body>
+<main>
+<header class="hero">
+<h1>🐉 ドラゴン育成島</h1>
+<p>卵を孵化させて、育てて、バトルに挑戦しよう！</p>
+<div class="statsbar"><span class="pill">🪙 コイン：<b id="coins">0</b></span><span class="pill">🥚 卵：<b id="eggs">0</b></span><span class="pill">🐲 仲間：<b id="count">0</b></span></div>
+</header>
+<nav class="tabs" aria-label="ゲームメニュー">
+<button class="active" data-tab="home">ホーム</button><button data-tab="battle">バトル</button><button data-tab="shop">ショップ</button><button data-tab="eggs">卵・孵化</button><button data-tab="guide">遊び方</button>
+</nav>
+<section id="view"></section>
+<footer>このゲームはこのHTMLファイルだけで動作します。セーブデータはこのブラウザ内に保存されます。</footer>
+</main>
+<script>
+const KEY="dragonIslandSave_v1";
+const fresh=()=>({coins:60,eggs:[],dragons:[],nextId:1,log:"最初のドラゴンを選んで冒険を始めよう！"});
+let state;
+try{state=JSON.parse(localStorage.getItem(KEY))||fresh();state.eggs=state.eggs||[];state.dragons=state.dragons||[];state.dragons.forEach(d=>{if(d.evolved===undefined)d.evolved=false;if(d.rare===undefined)d.rare=false})}catch(e){state=fresh()}
+const types={leaf:{emoji:"🐉",name:"リーフドラゴン",color:"草",food:"やわらかリーフ"},flame:{emoji:"🐲",name:"フレアドラゴン",color:"炎",food:"ぽかぽかベリー"},aqua:{emoji:"🐉",name:"アクアドラゴン",color:"水",food:"しずくゼリー"},sky:{emoji:"🐲",name:"スカイドラゴン",color:"風",food:"ふわふわマカロン"}};
+const foods=[{id:"leaf",name:"やわらかリーフ",price:10,aff:8},{id:"flame",name:"ぽかぽかベリー",price:12,aff:9},{id:"aqua",name:"しずくゼリー",price:12,aff:9},{id:"sky",name:"ふわふわマカロン",price:14,aff:10},{id:"mix",name:"ごちそうプレート",price:25,aff:20}];
+let selected=0,tab="home";
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function dragon(){return state.dragons[selected]||state.dragons[0]}
+function xpNeed(d){return d.level*20}
+function bar(v,max){return `<div class="meter"><span style="width:${Math.max(0,Math.min(100,v/max*100))}%"></span></div>`}
+function header(){document.getElementById("coins").textContent=state.coins;document.getElementById("eggs").textContent=state.eggs.length;document.getElementById("count").textContent=state.dragons.length}
+function render(){
+ header();document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+ const v=document.getElementById("view");
+ if(tab==="home")v.innerHTML=home();if(tab==="battle")v.innerHTML=battle();if(tab==="shop")v.innerHTML=shop();if(tab==="eggs")v.innerHTML=eggView();if(tab==="guide")v.innerHTML=guide();
+}
+function home(){
+ if(!state.dragons.length)return `<div class="card"><h2>🌟 最初のドラゴンを選ぼう！</h2><p>好きなドラゴンを1匹選んで冒険スタート。タイプによって得意なステータスが違うよ。</p><div class="grid">${Object.entries(types).map(([key,t])=>{let stats={leaf:"バランス型",flame:"攻撃が高い",aqua:"HPが高い",sky:"防御が高い"};let desc={leaf:"はじめての育成におすすめ",flame:"バトルで力を発揮！",aqua:"元気で打たれ強い！",sky:"守りが得意なしっかり者"};return `<div class="card"><div class="egg">${t.emoji}</div><h3>${t.name}</h3><p class="muted">${desc[key]}</p><p><b>${stats[key]}</b></p><button class="action primary" onclick="startWith('${key}')">この子に決める！</button></div>`}).join("")}</div></div>`;
+ const d=dragon(),t=types[d.type];
+ return `<div class="grid"><div class="card"><div class="dragon"><div class="sprite">${t.emoji}</div><div><h2>${d.name} ${d.evolved?'<span class="rare">✦進化</span>':""} ${d.rare?'<span class="rare">★レア</span>':""}</h2><div class="muted">${t.name}・${t.color}タイプ</div><strong>Lv.${d.level}</strong></div></div><hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+<div class="statline"><b>経験値</b><span>${d.xp} / ${xpNeed(d)}</span></div>${bar(d.xp,xpNeed(d))}
+<div class="statline"><b>なつき度</b><span>${d.aff} / 100</span></div>${bar(d.aff,100)}
+<div class="statline"><b>HP</b><span>${d.hp} / ${d.maxHp}</span></div>${bar(d.hp,d.maxHp)}
+<div class="statline"><b>攻撃</b><b>${d.atk}</b></div><div class="statline"><b>防御</b><b>${d.def}</b></div>
+<div class="actions"><button class="action primary" onclick="setTab('shop')">🍎 ご飯を買う</button><button class="action" onclick="feed(${d.id},'${d.type}')">ご飯をあげる</button></div></div>
+<div class="card"><h2>仲間を選ぶ</h2>${state.dragons.map((x,i)=>`<div class="shopitem"><span>${types[x.type].emoji} ${x.name} <span class="small">Lv.${x.level}</span></span><button class="action" onclick="selectDragon(${i})">${i===selected?"選択中":"選ぶ"}</button></div>`).join("")}<p class="small">バトルで経験値を獲得するとレベルアップ！レベルに応じてHP・攻撃・防御が上がります。</p></div></div>
+<div class="card" style="margin-top:14px"><h3>冒険メモ</h3><div class="log">${esc(state.log)}</div></div>`;
+}
+function battle(){let d=dragon();let rivals=state.dragons.filter(x=>x.id!==d?.id);return `<div class="grid"><div class="card"><h2>⚔️ 草原バトル</h2><p>野生のモンスターと勝負！勝つと経験値とコインを獲得できます。</p><div class="notice">参加ドラゴン：${d?d.name+"（Lv."+d.level+"）":"なし"}<br>勝利報酬：経験値 +${d?12+d.level*2:0} ／ コイン +${d?15+d.level*3:0}</div><div class="actions"><button class="action primary" onclick="fight()" ${d?"":"disabled"}>野生モンスターとバトル</button></div></div><div class="card"><h2>🐲 ドラゴン対決</h2><p>育てた仲間同士で腕試し！勝ったドラゴンに経験値が入るよ。</p>${rivals.length?`<div class="shopitem"><span>対戦相手</span><select id="rivalSelect">${rivals.map(x=>`<option value="${x.id}">${esc(x.name)}（Lv.${x.level}）</option>`).join("")}</select></div><button class="action primary" onclick="dragonDuel()">対決する！</button>`:`<p class="muted">対戦にはドラゴンが2匹以上必要です。卵を孵化させて仲間を増やそう！</p>`}</div><div class="card"><h3>バトルログ</h3><div class="log">${esc(state.log)}</div></div></div>`}
+function shop(){return `<div class="card"><h2>🍎 ご飯ショップ</h2><p class="muted">ご飯を買ってホームでドラゴンにあげよう。なつき度が上がります。</p>${foods.map(f=>`<div class="shopitem"><div><b>${f.name}</b><div class="small">なつき度 +${f.aff}</div></div><button class="action" onclick="buy('${f.id}')">🪙 ${f.price} コインで買う</button></div>`).join("")}<div class="actions"><button class="action" onclick="setTab('home')">ホームへ</button></div></div>`}
+function eggView(){return `<div class="grid"><div class="card"><h2>🥚 卵を手に入れる</h2><p>卵を買って、新しいドラゴンを仲間にしよう。</p><div class="egg">🥚</div><div class="shopitem"><span><b>ふしぎな卵</b><div class="small">通常ドラゴンが生まれる</div></span><button class="action primary" onclick="buyEgg()">40 🪙</button></div><div class="shopitem"><span><b class="rare">✨ きらめくレア卵</b><div class="small">生まれた時から少し強く、なつき度も高い</div></span><button class="action" onclick="buyRareEgg()">100 🪙</button></div></div><div class="card"><h2>孵化させる</h2>${state.eggs.length?state.eggs.map(e=>`<div class="shopitem"><span>${e.rare?"✨":"🥚"} ${e.name} ${e.rare?'<span class="rare">RARE</span>':""}</span><button class="action primary" onclick="hatch(${e.id})">孵化する</button></div>`).join(""):`<p class="muted">卵がありません。卵を買いに行こう！</p>`}</div></div>`}
+function guide(){return `<div class="card"><h2>📘 はじめての遊び方</h2><p>このゲームは、ドラゴンを選んで育て、バトルや卵集めを楽しむゲームです。</p><h3>1. 最初のドラゴンを選ぶ</h3><p>ホームで好きなタイプを選びます。草はバランス、炎は攻撃、水はHP、風は防御が得意です。</p><h3>2. バトルでコインと経験値を集める</h3><p>「バトル」から野生モンスターに挑戦。勝つと経験値とコインがもらえます。経験値がたまるとレベルアップし、HP・攻撃・防御が上がります。</p><h3>3. ご飯をあげてなつき度アップ</h3><p>「ショップ」でご飯を選ぶと、コインを使ってドラゴンにご飯をあげられます。ホームの「ご飯をあげる」ボタンでも、選択中のドラゴンに対応したご飯を直接あげられます。</p><h3>4. 卵を買って孵化させる</h3><p>「卵・孵化」で卵を購入し、「孵化する」を押すと新しい仲間が増えます。レア卵からは最初から少し強いドラゴンが生まれます。</p><h3>5. 進化・ドラゴン対決</h3><p>レベル5になると進化します。仲間が2匹以上いると、バトル画面でドラゴン同士の対決もできます。</p><div class="notice"><b>💾 セーブについて</b><br>ゲームの進行は同じブラウザに自動保存されます。別のブラウザや端末には引き継がれません。ブラウザの閲覧データを消すとセーブも消える場合があります。</div><div class="actions"><button class="action primary" onclick="setTab('home')">ゲームに戻る</button><button class="action" onclick="resetGame()">最初からやり直す</button></div><p class="small">「最初からやり直す」を押すと今のセーブデータは消えて、最初のドラゴン選択から始まります。</p></div>`}
+function startWith(type){if(state.dragons.length)return;let presets={leaf:{name:"ミドリ",hp:32,atk:7,def:5,aff:35},flame:{name:"ホムラ",hp:27,atk:10,def:3,aff:25},aqua:{name:"アクア",hp:38,atk:6,def:4,aff:30},sky:{name:"ソラ",hp:29,atk:7,def:8,aff:30}};let x=presets[type];state.dragons=[{id:state.nextId++,name:x.name,type,level:1,xp:0,hp:x.hp,maxHp:x.hp,atk:x.atk,def:x.def,aff:x.aff,rare:false,evolved:false}];state.log=x.name+"が仲間になった！冒険スタート！";selected=0;tab="home";save()}
+function resetGame(){if(!confirm("セーブデータを消して、最初から始めますか？"))return;state=fresh();selected=0;tab="home";save()}
+function setTab(x){tab=x;render()}function selectDragon(i){selected=i;setTab("home")}
+function buy(id){let f=foods.find(x=>x.id===id);if(state.coins<f.price){state.log="コインが足りない！バトルで集めよう。";return save()}state.coins-=f.price;state.log=f.name+"を買った！ホームでドラゴンにあげよう。";save()}
+function feed(id,type){let d=state.dragons.find(x=>x.id===id);if(!d)return;let f=foods.find(x=>x.id===type)||foods[0];if(state.coins<0)return; // 購入済みのご飯を使う簡易仕様
+ if(state.coins<0)return;
+ // ご飯はホームから直接あげる方式。コインを消費して購入・給餌をまとめて処理。
+ if(state.coins<f.price){state.log="コインが足りない！ショップでご飯を買うか、バトルで集めよう。";return save()}
+ state.coins-=f.price;d.aff=Math.min(100,d.aff+f.aff);state.log=d.name+"に"+f.name+"をあげた！なつき度が "+d.aff+" になった。";save()}
+function buyEgg(){if(state.coins<40){state.log="卵を買うには40コイン必要だよ。";return save()}state.coins-=40;let id=state.nextId++;state.eggs.push({id,type:"mystery",name:"ふしぎな卵"});state.log="ふしぎな卵を手に入れた！孵化させてみよう。";save()}
+function buyRareEgg(){if(state.coins<100){state.log="レア卵には100コイン必要だよ。";return save()}state.coins-=100;let id=state.nextId++;state.eggs.push({id,type:"mystery",name:"きらめくレア卵",rare:true});state.log="✨ きらめくレア卵を手に入れた！";save()}
+function hatch(id){let i=state.eggs.findIndex(e=>e.id===id);if(i<0)return;let egg=state.eggs.splice(i,1)[0];let keys=Object.keys(types),type=keys[Math.floor(Math.random()*keys.length)],n=state.dragons.length+1;let rare=!!egg.rare;let d={id:state.nextId++,name:["ルナ","ソラ","モカ","ハル","コハク","ユキ"][Math.floor(Math.random()*6)]+(n>1?n:""),type,level:1,xp:0,hp:rare?40:30,maxHp:rare?40:30,atk:rare?10:7,def:rare?6:4,aff:rare?40:20,rare,evolved:false};state.dragons.push(d);selected=state.dragons.length-1;state.log=(rare?"✨ レアドラゴン誕生！ ":"")+d.name+"（"+types[type].name+"）が卵から生まれた！";save()}
+function levelUp(d){while(d.xp>=xpNeed(d)){d.xp-=xpNeed(d);d.level++;d.maxHp+=6;d.hp=d.maxHp;d.atk+=2;d.def+=1;state.log+="\n🎉 "+d.name+"はレベル"+d.level+"になった！HP・攻撃・防御が上がった！";if(d.level>=5&&!d.evolved){d.evolved=true;d.maxHp+=15;d.hp=d.maxHp;d.atk+=5;d.def+=3;d.name+="・進化";state.log+="\n🌟 "+d.name+"に進化！さらにステータスが上がった！"}}}
+function dragonDuel(){let a=dragon(),id=Number(document.getElementById("rivalSelect")?.value),b=state.dragons.find(x=>x.id===id);if(!a||!b)return;let scoreA=a.atk+a.def+Math.floor(a.maxHp/10)+Math.floor(a.aff/20)+Math.random()*10,scoreB=b.atk+b.def+Math.floor(b.maxHp/10)+Math.floor(b.aff/20)+Math.random()*10;let winner=scoreA>=scoreB?a:b;winner.xp+=10;let loser=winner.id===a.id?b:a;loser.xp+=4;state.log="🐲 ドラゴン対決！ "+a.name+" VS "+b.name+"\n勝者："+winner.name+"！勝者は経験値10、もう一匹も経験値4を獲得！";levelUp(winner);levelUp(loser);save()}
+function fight(){let d=dragon();if(!d)return;let enemyLv=Math.max(1,d.level+Math.floor(Math.random()*3)-1),enemyHp=18+enemyLv*8,enemyAtk=4+enemyLv*2;let myPower=d.atk+d.def+Math.floor(d.aff/20);let enemyPower=enemyAtk+Math.floor(enemyLv*1.5);let win=myPower+Math.random()*12>=enemyPower+Math.random()*10;
+ if(win){let xp=12+d.level*2,coins=15+d.level*3;d.xp+=xp;d.hp=Math.min(d.maxHp,d.hp+5);state.coins+=coins;state.log="🏆 勝利！ "+d.name+"は経験値を"+xp+"、コインを"+coins+"枚ゲット！\n少し体力も回復した。";levelUp(d)}
+ else{d.hp=Math.max(1,d.hp- Math.min(8,enemyAtk));state.log="今回は惜しくも負けてしまった…。経験を積んで、ご飯をあげて再挑戦しよう。"}
+ save()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+render();
+</script>
+</body></html>
