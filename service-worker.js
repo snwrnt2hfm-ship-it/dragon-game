@@ -1,7 +1,7 @@
-const CACHE_NAME = "dragon-raising-v2";
+const CACHE_NAME = "dragon-island-kawaii-motion-v3";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./dragon-art.jpg"];
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(FILES)));
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(FILES.filter(Boolean))));
   self.skipWaiting();
 });
 self.addEventListener("activate", event => {

@@ -3,32 +3,50 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ドラゴン育成島</title>
+<title>ドラゴン育成島 ♡</title>
 <style>
 :root{--ink:#243047;--muted:#66738a;--panel:#fff;--bg:#eef5f3;--green:#3c9877;--gold:#d89a2b;--line:#dce7e3}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#e5f3ef,#f8f1df);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:var(--ink)}
 main{max-width:980px;margin:auto;padding:22px 16px 48px}.hero{background:linear-gradient(120deg,#255f57,#4c9b7a);color:white;border-radius:22px;padding:22px 24px;box-shadow:0 12px 30px #244b3b22}
 h1{margin:0 0 6px;font-size:clamp(25px,5vw,36px)}.hero p{margin:0;color:#e4f5eb}.statsbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.pill{background:#ffffff20;border:1px solid #ffffff40;border-radius:999px;padding:7px 13px;font-weight:700}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tabs button,.action{border:0;border-radius:12px;padding:11px 16px;background:#fff;color:var(--ink);font-weight:750;cursor:pointer;box-shadow:0 3px 10px #233b3010}.tabs button.active,.action.primary{background:var(--green);color:#fff}.tabs button:focus-visible,.action:focus-visible{outline:3px solid #e6ae44;outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 7px 20px #203c3010}.card h2,.card h3{margin:0 0 12px}.dragon{display:flex;align-items:center;gap:16px}.sprite{font-size:76px;line-height:1.1;background:#eaf5ef;border-radius:18px;padding:12px}.muted{color:var(--muted);font-size:14px}.meter{height:10px;background:#e9efed;border-radius:99px;overflow:hidden;margin:6px 0 12px}.meter span{display:block;height:100%;background:linear-gradient(90deg,#53ae87,#9acb74);border-radius:99px}.statline{display:flex;justify-content:space-between;gap:10px;font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.action{background:#edf4f1;box-shadow:none}.action:disabled{opacity:.45;cursor:not-allowed}.log{background:#f5f8f7;border-radius:12px;padding:12px;min-height:76px;white-space:pre-line;font-size:14px}.egg{font-size:76px;text-align:center;padding:10px}.shopitem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.shopitem:last-child{border:0}.notice{background:#fff5dc;border:1px solid #f0dda8;padding:12px;border-radius:12px;font-size:14px}.rare{color:#9a59bd;font-weight:800}.small{font-size:12px;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}.art-wrap{margin:0 0 14px;border-radius:22px;overflow:hidden;box-shadow:0 10px 26px #244b3b20;background:#bde7f8}.game-art{display:block;width:100%;height:clamp(150px,34vw,300px);object-fit:cover;object-position:center 45%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 7px 20px #203c3010}.card h2,.card h3{margin:0 0 12px}.dragon{display:flex;align-items:center;gap:16px}.sprite{font-size:76px;line-height:1.1;background:#eaf5ef;border-radius:18px;padding:12px}.muted{color:var(--muted);font-size:14px}.meter{height:10px;background:#e9efed;border-radius:99px;overflow:hidden;margin:6px 0 12px}.meter span{display:block;height:100%;background:linear-gradient(90deg,#53ae87,#9acb74);border-radius:99px}.statline{display:flex;justify-content:space-between;gap:10px;font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.action{background:#edf4f1;box-shadow:none}.action:disabled{opacity:.45;cursor:not-allowed}.log{background:#f5f8f7;border-radius:12px;padding:12px;min-height:76px;white-space:pre-line;font-size:14px}.egg{font-size:76px;text-align:center;padding:10px}.shopitem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.shopitem:last-child{border:0}.notice{background:#fff5dc;border:1px solid #f0dda8;padding:12px;border-radius:12px;font-size:14px}.rare{color:#9a59bd;font-weight:800}.small{font-size:12px;color:var(--muted)}footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
 @media(max-width:520px){main{padding:14px 11px 30px}.hero{padding:18px}.sprite{font-size:58px}.card{padding:15px}}
+
+/* Kawaii look + CSS-only character motion */
+:root{--pink:#ff9fc8;--pink-dark:#ed78ad;--sky:#8cddf4;--cream:#fff8e9;--lav:#c6b5f4}
+body{background:radial-gradient(circle at 8% 8%,#fff0f7 0,transparent 27%),radial-gradient(circle at 92% 14%,#e5f8ff 0,transparent 30%),linear-gradient(145deg,#fff3f8,#eefaff 55%,#fff9e9)}
+main{max-width:980px}
+.art-wrap{margin:0 0 14px;border:4px solid white;border-radius:24px;overflow:hidden;box-shadow:0 10px 26px #aa82b533;background:#c8efff}
+.game-art{display:block;width:100%;height:clamp(150px,34vw,300px);object-fit:cover;object-position:center 43%}
+.hero{background:linear-gradient(120deg,#ff9fc8,#a88de8 55%,#79cfe9);border:3px solid #fff;box-shadow:0 10px 25px #bd91c833}
+.pill{background:#ffffff35;border-color:#ffffff70}
+.tabs button,.action{border-radius:999px!important;border:2px solid #fff!important;box-shadow:0 4px 0 #c9b5dc55,0 6px 15px #a78bc522!important;transition:transform .16s ease,filter .16s ease}
+.tabs button.active,.action.primary{background:linear-gradient(135deg,#ff91bc,#ed80b0)!important;color:white!important}
+.card{border:2px solid #fff;border-radius:22px;background:linear-gradient(160deg,#fff,#fff8fc);box-shadow:0 8px 22px #a78bc51b}
+.card h2,.card h3{color:#765b91}
+.sprite,.egg{border:2px solid #fff;background:linear-gradient(145deg,#fff0f7,#e8f8ff);border-radius:24px;box-shadow:inset 0 2px 8px #fff,0 5px 14px #a78bc522}
+.sprite{display:grid;place-items:center;min-width:88px;min-height:88px;animation:dragon-idle 2.4s ease-in-out infinite;transform-origin:50% 85%}
+.egg{animation:egg-wiggle 3s ease-in-out infinite}
+@keyframes dragon-idle{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-11px) rotate(2deg)}}
+@keyframes egg-wiggle{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-7deg)}94%{transform:rotate(7deg)}97%{transform:rotate(-4deg)}}
+.dragon:active .sprite,.sprite:active{animation:dragon-hop .55s ease}
+@keyframes dragon-hop{0%,100%{transform:translateY(0) scale(1)}35%{transform:translateY(-22px) scale(1.08)}65%{transform:translateY(-8px) scale(1.03)}}
+button:active,.action:active{transform:translateY(3px) scale(.97)!important;filter:brightness(1.04)}
+.meter{background:#f8eaf2;border:1px solid #fff;height:12px}
+.meter span{background:linear-gradient(90deg,#ff9fc8,#ffd477,#8bdcbf)}
+.notice{background:#fff8df;border-color:#ffe3a0;border-radius:18px}
+.log{background:#fff4fa;border:1px solid #ffe0ef;border-radius:16px}
+.shopitem{border-color:#f7dfec}
+.rare{color:#a66bd1}
+footer{color:#9a83a9}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
 </style>
-
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#f5f7fb">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
-  });
-}
-</script>
-
 </head>
 <body>
 <main>
-<div class="art-wrap"><img class="game-art" src="./dragon-art.jpg" alt="草原とお城を背景にした赤い子ドラゴンのイラスト"></div>
+<div class="art-wrap"><img class="game-art" src="./dragon-art.jpg" alt="かわいいドラゴンとファンタジーの世界"></div>
 <header class="hero">
 <h1>🐉 ドラゴン育成島</h1>
 <p>卵を孵化させて、育てて、バトルに挑戦しよう！</p>
@@ -38,7 +56,7 @@ if ("serviceWorker" in navigator) {
 <button class="active" data-tab="home">ホーム</button><button data-tab="battle">バトル</button><button data-tab="shop">ショップ</button><button data-tab="eggs">卵・孵化</button><button data-tab="guide">遊び方</button>
 </nav>
 <section id="view"></section>
-<footer>このゲームはこのHTMLファイルだけで動作します。セーブデータはこのブラウザ内に保存されます。</footer>
+<footer>CSSアニメーション入り！ドラゴンはふわふわ動くよ。セーブデータはこのブラウザ内に保存されます。</footer>
 </main>
 <script>
 const KEY="dragonIslandSave_v1";
